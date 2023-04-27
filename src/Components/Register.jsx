@@ -1,21 +1,45 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../Providers/AuthProviders';
 
 const Register = () => {
-    const {createUser, emailVerified} = useContext(UserContext);
+    const {createUser, emailVerified, proFileUpdate} = useContext(UserContext);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
 
     const handleRegister = (event) => {
+        setError('');
+        setSuccess('');
         event.preventDefault();
         const form = event.target;
         const name = form.name.value;
         const email = form.email.value;
+        const photo = form.photo.value;
         const password = form.password.value;
+
+        if (password.length < 8) {
+            setError("Password length must be at least 8 characters");
+            return;
+          } else if (password.length >= 15) {
+            setError("Password length must not exceed 15 characters");
+            return;
+          } else if (!/(?=.*[A-Z])/.test(password)) {
+            setError("Password must be at least one uppercase");
+            return;
+          } else if (!/(?=.*[@$!%#*?&])/.test(password)) {
+            setError("Password must be at least one special characters");
+            return;
+          } else if (!/[0-9]/.test(password)) {
+            setError("Password must be at least one number");
+            return;
+          }
+
 
         createUser(email, password)
         .then((result) => {
             const loggedUser = result.user;
-            loggedUser.displayName = name;
+
+            proFileUpdate(loggedUser, name, photo);
 
             emailVerified()
             .then(() => {
@@ -23,12 +47,13 @@ const Register = () => {
               });
 
             console.log(loggedUser)
+            setSuccess('user has been create successfully')
           })
           .catch((error) => {
             const errorMessage = error.message;
-            console.log(errorMessage)
+            setError(errorMessage);
           });
-        
+        console.log(photo)
     }
 
     return (
@@ -51,9 +76,17 @@ const Register = () => {
                         </div>
                         <div className="form-control">
                             <label className="label">
+                                <span className="label-photo">Email</span>
+                            </label>
+                            <input type="file" placeholder="upload your photo" name="photo" className="input input-bordered" required />
+                        </div>
+                        <div className="form-control">
+                            <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
                             <input type="password" placeholder="password" name="password" className="input input-bordered" required/>
+                            <p className='text-red-400 mt-5'>{error}</p>
+                            <p className='text-green-400'>{success}</p>
                             <p className='mt-5'>if you have an account Please!!
                                  <Link to="/login">
                                   <button className="btn btn-xs ml-2">login</button></Link>

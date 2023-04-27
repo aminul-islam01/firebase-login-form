@@ -1,5 +1,5 @@
 import React, { createContext, useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged, sendEmailVerification, signInWithEmailAndPassword, signOut, updateProfile } from "firebase/auth";
 import app from '../Firebase/firebase.config';
 
 const auth = getAuth(app)
@@ -27,6 +27,19 @@ const AuthProviders = ({children}) => {
         return sendEmailVerification(auth.currentUser)
     }
 
+    const proFileUpdate = (loggedUser, name, photo) => {
+        updateProfile(loggedUser, {
+          displayName: name,
+          photoURL: photo,
+        })
+          .then((result) => {
+            console.log("profile updated");
+          })
+          .catch((error) => {
+            console.log(error.message);
+          });
+      };
+
     useEffect( () =>{
         const unsubscribe = onAuthStateChanged(auth, (user) => {
               setUser(user);
@@ -37,7 +50,7 @@ const AuthProviders = ({children}) => {
           }
 
     }, [])
-
+    console.log(user)
     const userInfo = {
         user,
         setUser,
@@ -45,7 +58,8 @@ const AuthProviders = ({children}) => {
         loginUser,
         logOut,
         loading,
-        emailVerified
+        emailVerified,
+        proFileUpdate
     }
 
     return (
