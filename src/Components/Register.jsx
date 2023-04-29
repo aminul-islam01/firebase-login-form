@@ -47,7 +47,8 @@ const Register = () => {
               });
 
             console.log(loggedUser)
-            setSuccess('user has been create successfully')
+            setSuccess('user has been create successfully');
+            form.reset();
           })
           .catch((error) => {
             const errorMessage = error.message;

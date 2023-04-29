@@ -50,7 +50,7 @@ const AuthProviders = ({children}) => {
           }
 
     }, [])
-    console.log(user)
+    // console.log(user)
     const userInfo = {
         user,
         setUser,
